@@ -3,6 +3,13 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from json import loads,dumps
 
+class Fraccion:
+    def __init__(self, num, den):
+        self.num = num
+        self.den = den
+    def toJSON(self):
+        return dumps(self, default=lambda o:o.__dict__, sort_keys=False, indent=4)
+
 # Create your views here.
 def nueva():
     return 0
