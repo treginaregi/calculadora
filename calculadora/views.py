@@ -30,10 +30,10 @@ def procesamiento(request):
 def suma(request):
     body_unicode = request.body.decode('utf-8')
     body = loads(body_unicode)
-    num1 = body['num1']
-    den1 = body['den1']
-    num2 = body['num2']
-    den2 = body['den2']
+    num1 = body['numerador1']
+    den1 = body['denominador1']
+    num2 = body['numerador2']
+    den2 = body['denominador2']
     if den1 == den2:
         num_resultado = num1 + num2
         den_resultado = den1
@@ -48,10 +48,10 @@ def suma(request):
 def resta(request):
     body_unicode = request.body.decode('utf-8')
     body = loads(body_unicode)
-    num1 = body['num1']
-    den1 = body['den1']
-    num2 = body['num2']
-    den2 = body['den2']
+    num1 = body['numerador1']
+    den1 = body['denominador1']
+    num2 = body['numerador2']
+    den2 = body['denominador2']
     if den1 == den2:
         num_resultado = num1 - num2
         den_resultado = den1
@@ -66,10 +66,10 @@ def resta(request):
 def multiplicacion(request):
     body_unicode = request.body.decode('utf-8')
     body = loads(body_unicode)
-    num1 = body['num1']
-    den1 = body['den1']
-    num2 = body['num2']
-    den2 = body['den2']
+    num1 = body['numerador1']
+    den1 = body['denominador1']
+    num2 = body['numerador2']
+    den2 = body['denominador2']
     num_resultado = num1 * num2
     den_resultado = den1 * den2
     resultado = Fraccion(num_resultado,den_resultado)
@@ -80,10 +80,10 @@ def multiplicacion(request):
 def division(request):
     body_unicode = request.body.decode('utf-8')
     body = loads(body_unicode)
-    num1 = body['num1']
-    den1 = body['den1']
-    num2 = body['num2']
-    den2 = body['den2']
+    num1 = body['numerador1']
+    den1 = body['denominador1']
+    num2 = body['numerador2']
+    den2 = body['denominador2']
     num_resultado = num1 * den2
     den_resultado = den1 * num2
     resultado = Fraccion(num_resultado,den_resultado)
