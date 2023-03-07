@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from json import loads,dumps
+import sqlite3
 
 class Fraccion:
     def __init__(self, num, den):
@@ -90,4 +91,64 @@ def division(request):
     resultado_json = resultado.toJSON()
     return HttpResponse(resultado_json, content_type = "text/json-comment-filtered")
 
+@csrf_exempt
+def usuarios(request):
+    if request.method == 'GET':
+        con = sqlite3.connect("db.sqlite3")
+        cur = con.cursor()
+        res = cur.execute("SELECT * FROM usuarios")
+        resultado = res.fetchall()
+        return render(request, 'datos.html',{'lista_usuarios':resultado})
+        #Ver otra opción en repositorio del profe
+    elif request.method == 'POST':
+        body = request.body.decode('utf-8')
+        eljson = loads(body)
+        grado = eljson['grado']
+        grupo = eljson['grupo']
+        num_lista = eljson['num_lista']
+        con = sqlite3.connect("db.sqlite3")
+        cur = con.cursor()
+        res = cur.execute("INSERT INTO usuarios (grupo, grado, num_lista) VALUES (?,?,?)", (grupo, grado, num_lista))
+        con.commit()
+        return HttpResponse("Usuario agregado")
+    elif request.method == 'DELETE':
+        return(usuarios_d(request))
 
+@csrf_exempt
+def usuarios_p(request):
+    body = request.body.decode('utf-8')
+    eljson = loads(body)
+    grado = eljson['grado']
+    grupo = eljson['grupo']
+    num_lista = eljson['num_lista']
+    con = sqlite3.connect("db.sqlite3")
+    cur = con.cursor()
+    res = cur.execute("INSERT INTO usuarios (grupo, grado, num_lista) VALUES (?,?,?)", (grupo, grado, num_lista))
+    con.commit()
+    return HttpResponse("Usuario agregado")
+
+@csrf_exempt
+def usuarios_d(request):
+    body = request.body.decode('utf-8')
+    eljson = loads(body)
+    grado = eljson['grado']
+    grupo = eljson['grupo']
+    num_lista = eljson['num_lista']
+    con = sqlite3.connect("db.sqlite3")
+    cur = con.cursor()
+    res = cur.execute("DELETE FROM usuarios WHERE grupo = ? AND grado = ? AND num_lista = ?", (grupo, grado, num_lista))
+    con.commit()
+    return HttpResponse("Usuario borrado")
+
+@csrf_exempt
+def usuarios_u(request):
+    body = request.body.decode('utf-8')
+    eljson = loads(body)
+    grado = eljson['grado']
+    grupo = eljson['grupo']
+    num_lista = eljson['num_lista']
+    con = sqlite3.connect("db.sqlite3")
+    cur = con.cursor()
+    res = cur.execute("DELETE FROM usuarios WHERE grupo = ? AND grado = ? AND num_lista = ?", (grupo, grado, num_lista))
+    con.commit()
+    return HttpResponse("Usuario borrado")
