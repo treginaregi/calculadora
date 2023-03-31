@@ -1,29 +1,13 @@
 <html>
     <head>
-        {% load static %}
-        <link href="{% static 'estilo.css'%}" rel="stylesheet"/>
-        <title> Usuarios </title>
+
     </head>
     <body>
-        <table>
-            <caption>  Usuarios </caption>
-            <thead> 
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Grupo</th>
-                    <th scope="col">Grado</th>
-                    <th scope="col">Número de lista</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for filas in lista_usuarios%}
-                <tr>
-                    {% for elemento in filas%}
-                    <th scope="row">{{elemento}}</th>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <h1>Lista de jugadores del juego</h1>
+	<ul>
+	{% for j in lista_jugadores%}
+	<li> {{j.nombre}} : {{j.minutos_jugados}} </li>
+	{% endfor%}
+	</ul>
     </body>
 </html>
