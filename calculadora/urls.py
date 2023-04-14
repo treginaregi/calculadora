@@ -2,6 +2,7 @@ from django.urls import include,path
 from rest_framework import routers
 from . import views
 #Sirve para importar la clase views que está en el directorio actual
+from .views import RetoListView, retoDetailView, RetoCreateView, RetoUpdateView, RetoDeleteView
 
 router = routers.DefaultRouter()
 router.register(r'reto', views.RetoViewSet)
@@ -27,4 +28,13 @@ urlpatterns = [
     path('procesologin', views.procesologin, name='procesologin'),
     path('grafica',views.grafica,name='grafica'),
     path('barras',views.barras,name='barras'),
+    path('consultabd',views.consultabd,name='consultabd'),
+    path('piechart',views.piechart,name='piechart'),
+    path('nuevoreto', views.nuevoreto, name='nuevoreto'),
+    path('nuevojugador', views.nuevojugador, name='nuevojugador'),
+    path('listaretos', RetoListView.as_view(), name='retos'),
+    path('detallereto/<int:pk>', retoDetailView.as_view(), name='detallereto'), 
+    path('reto/add', RetoCreateView.as_view(), name='add_reto'), 
+    path('reto/<int:pk>', RetoUpdateView.as_view(), name='edit_reto'),
+    path('reto/delete/<int:pk>', RetoDeleteView.as_view(), name='delete_reto'),
 ]

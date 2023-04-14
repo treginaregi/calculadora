@@ -8,6 +8,10 @@ from json import loads,dumps
 import sqlite3 
 import requests
 from random import randrange
+from .forms import CrearRetoForm, JugadorModelForm
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 class Fraccion:
     def __init__(self, num, den):
@@ -282,7 +286,9 @@ def barras(request):
     '''
     data = []
     data.append(['Jugador', 'Minutos Jugados'])
-    resultados = Reto.objects.all() #select * from reto;
+    resultados = Reto.objects.all() #select * from reto; 
+    #INVOCAR EL SERVICIO QUE ACABO DE DEFINIR, CAMBIAR ARRIBA
+    #A TRAVÉS DE REQUESTS 
     titulo = 'Videojuego Odyssey'
     titulo_formato = dumps(titulo)
     subtitulo= 'Total de minutos por jugador'
@@ -297,3 +303,91 @@ def barras(request):
         return render(request,'barras.html',elJSON)
     else:
         return HttpResponse("<h1> No hay registros a mostrar</h1>")
+    
+#ADENTRO DE LA GRÁFICA NO DEBE DE HABER CONSULTA A LA DB
+#PRIMERO HACER SERVICIO
+
+def consultabd(request):
+    resultados = Partidas.objects.all()
+    data = [['Usuario', 'Minutos Jugados']]
+    for registro in resultados:
+        id_usuario = str(registro.id_usuario)
+        minutos_jugados = int(registro.minutos_jugados)
+        data.append([id_usuario, minutos_jugados])
+    data_json = dumps({'losDatos': data})
+    return HttpResponse(data_json, content_type='application/json')
+
+@csrf_exempt
+def piechart(request):
+    url = "http://127.0.0.1:8000/consultabd"
+    response = requests.get(url)
+    data = loads(response.content)['losDatos']
+    titulo = 'Videojuego'
+    titulo_formato = dumps(titulo)
+    subtitulo= 'Minutos jugados'
+    subtitulo_formato = dumps(subtitulo)
+    elJSON = {'losDatos': data, 'titulo': titulo_formato, 'subtitulo': subtitulo_formato}
+    return render(request,'pie.html',elJSON)
+
+
+def nuevoreto(request):
+    if (request.method == 'POST'):#POST
+        form = CrearRetoForm(request.POST)
+        if(form.is_valid()):
+            nombre_usuario = form.cleaned_data['nombre']
+            minutos = form.cleaned_data['minutos']
+            '''Creación de registro directo en BD'''
+            #nuevo_registro =Reto.objects.create(nombre=nombre_usuario,minutos_jugados=minutos)
+            #nuevo_registro.save()
+            #invoca el servicio de creación de usuario
+            '''Creación de registro usando api REST'''
+            url = "http://127.0.0.1:8000/apireto/"
+            header = {
+            "Content-Type":"application/json"
+            }
+            payload = {   
+            "nombre" :nombre_usuario,
+            "minutos_jugados" : minutos
+            }
+            result = requests.post(url,  data= dumps(payload), headers=header)
+            if result.status_code == 201:
+                return HttpResponse('Nuevo usuario creado '+nombre_usuario)
+            else:
+                return HttpResponse('Error al crear el usuario ')
+            
+    else:#GET
+        form = CrearRetoForm
+        return render(request, 'crearReto.html',{'form':form})
+
+def nuevojugador(request):
+     if (request.method == 'POST'):#POST
+        form = JugadorModelForm(request.POST)
+        if(form.is_valid()):
+            form.save()
+            return HttpResponse('Nuevo alumno creado en el grupo: ' + form["grupo"].value())
+     else:
+        form = JugadorModelForm
+        return render(request, 'crearJugador.html',{'form':form})
+     
+class RetoListView(ListView):
+    model = Reto
+    template_name = 'retos.html'
+    context_object_name = 'retos'
+class retoDetailView(DetailView):
+    model = Reto
+    template_name = 'reto.html'
+    context_object_name = 'reto'
+class RetoCreateView(CreateView):
+    model = Reto
+    template_name = 'create_edit.html'
+    fields = ['nombre','minutos_jugados']
+    success_url = '/listaretos'
+class RetoUpdateView(UpdateView):
+    model = Reto
+    template_name = 'create_edit.html'
+    fields = ['nombre','minutos_jugados']
+    success_url = '/listaretos'
+class RetoDeleteView(DeleteView):
+    model = Reto
+    template_name = 'confirma.html'
+    success_url = '/listaretos'
